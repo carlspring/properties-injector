@@ -61,10 +61,10 @@ public class PropertyValueInjector
 
                 if (key.trim().equals(""))
                 {
-                    // Put a warning here
+                    // Put a warning here when the logging has been set up.
 
-                    System.out.println("WARN: Ignoring @PropertyValue annotation on field '" + field.getName() +
-                                       "' in class '" +clazz.getName() + "' as it has an empty key.");
+                    // System.out.println("WARN: Ignoring @PropertyValue annotation on field '" + field.getName() +
+                    //                    "' in class '" +clazz.getName() + "' as it has an empty key.");
 
                     continue;
                 }

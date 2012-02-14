@@ -12,6 +12,13 @@
     <name>Properties Injector</name>
     <description>An annotation based properties injector</description>
 
+    <developers>
+        <developer>
+            <name>Martin Todorov</name>
+            <email>carlspring@gmail.com</email>
+        </developer>
+    </developers>
+
     <build>
         <resources>
             <resource>

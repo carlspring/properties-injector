@@ -1,0 +1,57 @@
+
+
+Defining @PropertiesResources
+------------------------------------------------------------------------------------
+You can use this annotation to define locations for properties files you would like
+have to loaded. If set this annotation on your class, you can avoid having to specify
+your @PropertyValue.resource for each property.
+
+Example:
+
+    @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })
+    private class PropertyHolder {
+        ...
+    }
+
+
+
+Using the @PropertyValue annotation
+------------------------------------------------------------------------------------
+You can use this annotation to link properties to a field.
+
+Example 1:
+
+    @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })
+    private class PropertyHolder
+    {
+        @PropertyValue(key = "jdbc.username")
+        String username;
+
+        ...
+
+    }
+
+You can also specify the explicit location of the properties file you would like to load from:
+
+Example 2:
+
+    private class PropertyHolder
+    {
+        @PropertyValue(key = "jdbc.username", resource = "META-INF/properties/other.properties")
+        String username;
+
+        ...
+
+    }
+
+
+How things work
+------------------------------------------------------------------------------------
+At some point in your bean, you need to invoke the PropertyValueInjector's inject(myClass.class) method.
+
+Example:
+
+        PropertyHolder holder = new PropertyHolder();
+
+        PropertyValueInjector.inject(holder);
+

@@ -1,0 +1,11 @@
+
+
+If you are sick and tired of having to write properties loading code for each new project
+where properties files are used and if you'd prefer to have simple annotations for this,
+then this project is what you are looking for.
+
+This is a very lightweight alternative of Spring's cool org.springframework.beans.factory.annotation.Value.
+While Spring's idea is great, sometimes you just have the limitation of not being allowed to use it in
+your project due to some constraint.
+
+

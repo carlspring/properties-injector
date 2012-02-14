@@ -1,0 +1,3 @@
+
+- Add annotation support on the getter method level.
+- Add proper logging.

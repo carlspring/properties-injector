@@ -30,9 +30,11 @@ public class PropertyValueInjectionTest
 
 
     @Test
-    public void testInjection()
+    public void testInjectionNoParents()
             throws IOException
     {
+        System.out.println("Testing class without inheritance...");
+
         PropertyHolder holder = new PropertyHolder();
 
         PropertyValueInjector.inject(holder);
@@ -44,14 +46,34 @@ public class PropertyValueInjectionTest
         System.out.println("Password: " + holder.getPassword());
     }
 
+    @Test
+    public void testInjectionFromParents()
+            throws IOException
+    {
+        System.out.println("Testing class with inheritance...");
+
+        ExtendedPropertyHolder holder = new ExtendedPropertyHolder();
+
+        PropertyValueInjector.inject(holder);
+
+        assertNotNull("Failed to inject property 'jdbc.username'!", holder.getUsername());
+        assertNotNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Failed to inject property 'jdbc.url'!", holder.getUrl());
+
+        System.out.println("Username: " + holder.getUsername());
+        System.out.println("Password: " + holder.getPassword());
+        System.out.println("URL:      " + holder.getUrl());
+    }
+
     @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })
     private class PropertyHolder
     {
         @PropertyValue(key = "jdbc.username")
         String username;
 
+        // Let's have a private field in the parent class.
         @PropertyValue(key = "jdbc.password")
-        String password;
+        private String password;
 
         @PropertyValue(key = "")
         String blah;
@@ -80,6 +102,28 @@ public class PropertyValueInjectionTest
         {
             this.password = password;
         }
+    }
+
+    private class ExtendedPropertyHolder extends PropertyHolder
+    {
+        @PropertyValue(key = "jdbc.url")
+        private String url;
+
+
+        private ExtendedPropertyHolder()
+        {
+        }
+
+        public String getUrl()
+        {
+            return url;
+        }
+
+        public void setUrl(String url)
+        {
+            this.url = url;
+        }
+
     }
 
 }

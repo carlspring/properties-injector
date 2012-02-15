@@ -21,9 +21,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author mtodorov
@@ -51,7 +49,11 @@ public class PropertyValueInjector
                                          Class clazz)
             throws IOException
     {
-        for (Field field : clazz.getDeclaredFields())
+        final List<Field> fields = new ArrayList<Field>();
+
+        getAllFields(fields, clazz);
+
+        for (Field field : fields)
         {
             PropertyValue propertyValue = field.getAnnotation(PropertyValue.class);
 
@@ -84,10 +86,25 @@ public class PropertyValueInjector
         }
     }
 
+    public static List<Field> getAllFields(List<Field> fields,
+                                           Class<?> clazz)
+    {
+        Collections.addAll(fields, clazz.getDeclaredFields());
+
+        if (clazz.getSuperclass() != null)
+        {
+            fields = getAllFields(fields, clazz.getSuperclass());
+        }
+
+        return fields;
+    }
+
     private static void loadPropertyResources(Class clazz)
             throws IOException
     {
-        Annotation[] annotations = clazz.getAnnotations();
+        final List<Annotation> annotations = new ArrayList<Annotation>();
+
+        getAllAnnotations(annotations, clazz);
 
         for (Annotation annotation : annotations)
         {
@@ -96,6 +113,19 @@ public class PropertyValueInjector
                 loadProperties(((PropertiesResources) annotation).resources());
             }
         }
+    }
+
+    public static List<Annotation> getAllAnnotations(List<Annotation> annotations,
+                                                     Class<?> clazz)
+    {
+        Collections.addAll(annotations, clazz.getAnnotations());
+
+        if (clazz.getSuperclass() != null)
+        {
+            annotations = getAllAnnotations(annotations, clazz.getSuperclass());
+        }
+
+        return annotations;
     }
 
     public static Properties getMergedProperties()

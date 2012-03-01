@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -59,6 +60,28 @@ public class PropertyValueInjectionTest
         assertNotNull("Failed to inject property 'jdbc.username'!", holder.getUsername());
         assertNotNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
         assertNotNull("Failed to inject property 'jdbc.url'!", holder.getUrl());
+
+        System.out.println("Username: " + holder.getUsername());
+        System.out.println("Password: " + holder.getPassword());
+        System.out.println("URL:      " + holder.getUrl());
+    }
+
+    @Test
+    public void testInjectionOverrideFromSystemProperties()
+            throws IOException
+    {
+        System.out.println("Testing class with inheritance...");
+
+        System.getProperties().setProperty("jdbc.password", "mypassw0rd");
+
+        ExtendedPropertyHolder holder = new ExtendedPropertyHolder();
+
+        PropertyValueInjector.inject(holder);
+
+        assertNotNull("Failed to inject property 'jdbc.username'!", holder.getUsername());
+        assertNotNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Failed to inject property 'jdbc.url'!", holder.getUrl());
+        assertEquals("Failed to override property with system value!", "mypassw0rd", holder.getPassword());
 
         System.out.println("Username: " + holder.getUsername());
         System.out.println("Password: " + holder.getPassword());

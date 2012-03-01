@@ -72,13 +72,20 @@ public class PropertyValueInjector
                 }
 
                 String value;
-                if (propertyValue.resource().trim().equals(""))
+                if (System.getProperty(key) != null)
                 {
-                    value = getMergedProperties().getProperty(key);
+                    value = System.getProperty(key);
                 }
                 else
                 {
-                    value = getValue(key, propertyValue.resource());
+                    if (propertyValue.resource().trim().equals(""))
+                    {
+                        value = getMergedProperties().getProperty(key);
+                    }
+                    else
+                    {
+                        value = getValue(key, propertyValue.resource());
+                    }
                 }
 
                 setField(field, target, value);

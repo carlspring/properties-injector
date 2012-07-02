@@ -88,7 +88,12 @@ public class PropertyValueInjector
                     }
                 }
 
-                setField(field, target, value);
+                if (value != null)
+                {
+                    // Add this check, as some fields might already have a defined value and
+                    // if there is no resolved property at this point, it would break things.
+                    setField(field, target, value);
+                }
             }
         }
     }
@@ -213,6 +218,8 @@ public class PropertyValueInjector
                                  Object target,
                                  Object value)
     {
+
+
         if (!Modifier.isPublic(field.getModifiers()))
         {
             field.setAccessible(true);

@@ -21,6 +21,9 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.sql.Date;
 import java.util.*;
 
 /**
@@ -36,18 +39,29 @@ public class PropertyValueInjector
 
 
     public static void inject(Object target)
-            throws IOException
+            throws InjectionException
     {
-        Class clazz = target.getClass();
+        try
+        {
+            Class clazz = target.getClass();
 
-        loadPropertyResources(clazz);
+            loadPropertyResources(clazz);
 
-        injectProperties(target, clazz);
+            injectProperties(target, clazz);
+        }
+        catch (IOException e)
+        {
+            throw new InjectionException(e);
+        }
+        catch (IllegalAccessException e)
+        {
+            throw new InjectionException(e);
+        }
     }
 
     private static void injectProperties(Object target,
                                          Class clazz)
-            throws IOException
+            throws IOException, IllegalAccessException
     {
         final List<Field> fields = new ArrayList<Field>();
 
@@ -217,6 +231,7 @@ public class PropertyValueInjector
     private static void setField(Field field,
                                  Object target,
                                  Object value)
+            throws IllegalAccessException
     {
 
 
@@ -227,7 +242,36 @@ public class PropertyValueInjector
 
         try
         {
-            field.set(target, value);
+            // Handle primitives
+            if (field.getType().equals(Integer.TYPE))
+            {
+                field.setInt(target, Integer.parseInt(value.toString()));
+            }
+            else if (field.getType().equals(Long.TYPE))
+            {
+                field.setLong(target, Long.parseLong(value.toString()));
+            }
+            else if (field.getType().equals(Float.TYPE))
+            {
+                field.setFloat(target, Float.parseFloat(value.toString()));
+            }
+            else if (field.getType().equals(Double.TYPE))
+            {
+                field.setDouble(target, Double.parseDouble(value.toString()));
+            }
+            else if (field.getType().equals(Boolean.TYPE))
+            {
+                field.setBoolean(target, Boolean.parseBoolean(value.toString()));
+            }
+            else if (field.getType().equals(Character.TYPE))
+            {
+                field.setChar(target, value.toString().charAt(0));
+            }
+            // Handle objects
+            else
+            {
+                field.set(target, value);
+            }
         }
         catch (IllegalAccessException iae)
         {

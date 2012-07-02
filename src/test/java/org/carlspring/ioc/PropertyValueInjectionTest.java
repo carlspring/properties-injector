@@ -32,7 +32,7 @@ public class PropertyValueInjectionTest
 
     @Test
     public void testInjectionNoParents()
-            throws IOException
+            throws InjectionException
     {
         System.out.println("Testing class without inheritance...");
 
@@ -49,7 +49,7 @@ public class PropertyValueInjectionTest
 
     @Test
     public void testInjectionFromParents()
-            throws IOException
+            throws InjectionException
     {
         System.out.println("Testing class with inheritance...");
 
@@ -68,7 +68,7 @@ public class PropertyValueInjectionTest
 
     @Test
     public void testInjectionOverrideFromSystemProperties()
-            throws IOException
+            throws InjectionException
     {
         System.out.println("Testing class with inheritance...");
 

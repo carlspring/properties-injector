@@ -55,3 +55,5 @@ Example:
 
         PropertyValueInjector.inject(holder);
 
+
+If you pass properties as arguments to the JVM, they will get picked up and override all other values.

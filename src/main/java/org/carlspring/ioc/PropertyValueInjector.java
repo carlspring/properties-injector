@@ -37,6 +37,8 @@ public class PropertyValueInjector
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
 
+	static boolean resourceDoesNotExist;
+
 
     public static void inject(Object target)
             throws InjectionException
@@ -63,6 +65,10 @@ public class PropertyValueInjector
                                          Class clazz)
             throws IOException, IllegalAccessException
     {
+	    if (resourceDoesNotExist) {
+		    return;
+	    }
+
         final List<Field> fields = new ArrayList<Field>();
 
         getAllFields(fields, clazz);
@@ -216,6 +222,11 @@ public class PropertyValueInjector
                 is = PropertyValueInjector.class.getClassLoader().getResourceAsStream(resource);
                 properties.load(is);
             }
+            catch (NullPointerException e)
+            {
+	            System.err.println("WARN: Resource '" + resource +"' does not exist or could not be loaded! Properties mapped to this resource will not be injected.");
+	            resourceDoesNotExist = true;
+            }
             finally
             {
                 if (is != null)
@@ -278,5 +289,13 @@ public class PropertyValueInjector
             throw new IllegalArgumentException("Could not set field " + field, iae);
         }
     }
+
+	public boolean resourceDoesNotExist() {
+		return resourceDoesNotExist;
+	}
+
+	public void setResourceDoesNotExist(boolean resourceDoesNotExist) {
+		this.resourceDoesNotExist = resourceDoesNotExist;
+	}
 
 }

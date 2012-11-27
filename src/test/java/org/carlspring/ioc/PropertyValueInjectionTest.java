@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -88,6 +89,21 @@ public class PropertyValueInjectionTest
         System.out.println("URL:      " + holder.getUrl());
     }
 
+	@Test
+	 public void testInjectionWithIncorrectResource()
+	         throws InjectionException
+	 {
+	     System.out.println("Testing class with incorrect resource...");
+
+	     System.getProperties().setProperty("jdbc.password", "mypassw0rd");
+
+	     PropertyHolderWithIncorrectResource holder = new PropertyHolderWithIncorrectResource();
+
+	     PropertyValueInjector.inject(holder);
+
+	     assertNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
+	 }
+
     @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })
     private class PropertyHolder
     {
@@ -148,5 +164,26 @@ public class PropertyValueInjectionTest
         }
 
     }
+
+	@PropertiesResources(resources = { "META-INF/properties/incorrect.properties" })
+	private class PropertyHolderWithIncorrectResource {
+
+        // Let's have a private field in the parent class.
+        @PropertyValue(key = "jdbc.password")
+        private String password;
+
+
+		private PropertyHolderWithIncorrectResource() {
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public void setPassword(String password) {
+			this.password = password;
+		}
+
+	}
 
 }

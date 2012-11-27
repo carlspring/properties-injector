@@ -16,6 +16,7 @@ package org.carlspring.ioc;
  * limitations under the License.
  */
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,8 +31,13 @@ import static org.junit.Assert.assertNotNull;
 public class PropertyValueInjectionTest
 {
 
+	@Before
+	public void setUp()
+			throws Exception {
+		PropertyValueInjector.resourceDoesNotExist = false;
+	}
 
-    @Test
+	@Test
     public void testInjectionNoParents()
             throws InjectionException
     {

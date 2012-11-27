@@ -49,7 +49,9 @@ public class PropertyValueInjector
 
             loadPropertyResources(clazz);
 
-            injectProperties(target, clazz);
+	        if (!resourceDoesNotExist) {
+		        injectProperties(target, clazz);
+	   	    }
         }
         catch (IOException e)
         {
@@ -65,10 +67,6 @@ public class PropertyValueInjector
                                          Class clazz)
             throws IOException, IllegalAccessException
     {
-	    if (resourceDoesNotExist) {
-		    return;
-	    }
-
         final List<Field> fields = new ArrayList<Field>();
 
         getAllFields(fields, clazz);
@@ -292,10 +290,6 @@ public class PropertyValueInjector
 
 	public boolean resourceDoesNotExist() {
 		return resourceDoesNotExist;
-	}
-
-	public void setResourceDoesNotExist(boolean resourceDoesNotExist) {
-		this.resourceDoesNotExist = resourceDoesNotExist;
 	}
 
 }

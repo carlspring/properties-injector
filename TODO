@@ -1,3 +1,8 @@
 
 - Add annotation support on the getter method level.
 - Add proper logging.
+
+- Add support for monitoring for property file changes and automatic reloading.
+- Add support for forcing a reload of the properties.
+- Add support for loading the properties from a database.
+- Add support for forcing a reload of the properties from the database.

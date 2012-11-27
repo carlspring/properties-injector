@@ -101,7 +101,7 @@ public class PropertyValueInjectionTest
 
 	     PropertyValueInjector.inject(holder);
 
-	     assertNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
+	     assertNull("Should have failed to inject property 'jdbc.password'!", holder.getPassword());
 	 }
 
     @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })

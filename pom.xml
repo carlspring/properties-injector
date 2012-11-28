@@ -5,7 +5,7 @@
 
     <groupId>org.carlspring</groupId>
     <artifactId>properties-injector</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>Properties Injector</name>
@@ -98,7 +98,8 @@
         <connection>scm:git:git@github.com:carlspring/properties-injector.git</connection>
         <url>scm:git:git@github.com:carlspring/properties-injector.git</url>
         <developerConnection>scm:git:git@github.com:carlspring/properties-injector.git</developerConnection>
-    </scm>
+      <tag>properties-injector-1.5</tag>
+  </scm>
 
     <distributionManagement>
         <repository>

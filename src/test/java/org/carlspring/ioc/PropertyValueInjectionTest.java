@@ -16,14 +16,14 @@ package org.carlspring.ioc;
  * limitations under the License.
  */
 
+import org.carlspring.ioc.mock.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author mtodorov
@@ -31,13 +31,14 @@ import static org.junit.Assert.assertNotNull;
 public class PropertyValueInjectionTest
 {
 
-	@Before
-	public void setUp()
-			throws Exception {
-		PropertyValueInjector.resourceDoesNotExist = false;
-	}
+    @Before
+    public void setUp()
+            throws Exception
+    {
+        PropertyValueInjector.resourceDoesNotExist = false;
+    }
 
-	@Test
+    @Test
     public void testInjectionNoParents()
             throws InjectionException
     {
@@ -95,101 +96,62 @@ public class PropertyValueInjectionTest
         System.out.println("URL:      " + holder.getUrl());
     }
 
-	@Test
-	 public void testInjectionWithIncorrectResource()
-	         throws InjectionException
-	 {
-	     System.out.println("Testing class with incorrect resource...");
-
-	     System.getProperties().setProperty("jdbc.password", "mypassw0rd");
-
-	     PropertyHolderWithIncorrectResource holder = new PropertyHolderWithIncorrectResource();
-
-	     PropertyValueInjector.inject(holder);
-
-	     assertNull("Should have failed to inject property 'jdbc.password'!", holder.getPassword());
-	 }
-
-    @PropertiesResources(resources = { "META-INF/properties/jdbc.properties" })
-    private class PropertyHolder
+    @Test
+    public void testInjectionWithIncorrectResource()
+            throws InjectionException
     {
-        @PropertyValue(key = "jdbc.username")
-        String username;
+        System.out.println("Testing class with incorrect resource...");
 
-        // Let's have a private field in the parent class.
-        @PropertyValue(key = "jdbc.password")
-        private String password;
+        System.getProperties().setProperty("jdbc.password", "mypassw0rd");
 
-        @PropertyValue(key = "")
-        String blah;
+        PropertyHolderWithIncorrectResource holder = new PropertyHolderWithIncorrectResource();
 
+        PropertyValueInjector.inject(holder);
 
-        private PropertyHolder()
-        {
-        }
-
-        public String getUsername()
-        {
-            return username;
-        }
-
-        public void setUsername(String username)
-        {
-            this.username = username;
-        }
-
-        public String getPassword()
-        {
-            return password;
-        }
-
-        public void setPassword(String password)
-        {
-            this.password = password;
-        }
+        assertNull("Should have failed to inject property 'jdbc.password'!", holder.getPassword());
     }
 
-    private class ExtendedPropertyHolder extends PropertyHolder
+    @Test
+    public void testInjectionWithClassExtendingAbstractClass()
+            throws InjectionException
     {
-        @PropertyValue(key = "jdbc.url")
-        private String url;
+        System.out.println("Testing class extending abstract class...");
 
+        ClassExtendingAbstractPropertyHolder holder = new ClassExtendingAbstractPropertyHolder();
+        holder.init();
 
-        private ExtendedPropertyHolder()
-        {
-        }
+        assertNotNull("Failed to inject property 'jdbc.username'!", holder.getUsername());
+        assertNotNull("Failed to inject property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Failed to inject property 'jdbc.url'!", holder.getUrl());
+        assertNotNull("Failed to inject property 'jdbc.version'!", holder.getVersion());
+        assertNotNull("Failed to inject property 'jdbc.autocommit'!", holder.isAutocommit());
 
-        public String getUrl()
-        {
-            return url;
-        }
-
-        public void setUrl(String url)
-        {
-            this.url = url;
-        }
-
+        System.out.println("Username:    " + holder.getUsername());
+        System.out.println("Password:    " + holder.getPassword());
+        System.out.println("URL:         " + holder.getUrl());
+        System.out.println("Version:     " + holder.getVersion());
+        System.out.println("Auto-commit: " + holder.isAutocommit());
     }
 
-	@PropertiesResources(resources = { "META-INF/properties/incorrect.properties" })
-	private class PropertyHolderWithIncorrectResource {
+    @Test
+    public void testInjectionWithClassExtendingAbstractClassAndPassingClassReference()
+            throws InjectionException
+    {
+        System.out.println("Testing class extending abstract class by passing a class reference...");
 
-        // Let's have a private field in the parent class.
-        @PropertyValue(key = "jdbc.password")
-        private String password;
+        PropertyHolderWithClassReference holder = new PropertyHolderWithClassReference();
 
+        try
+        {
+            holder.init();
 
-		private PropertyHolderWithIncorrectResource() {
-		}
-
-		public String getPassword() {
-			return password;
-		}
-
-		public void setPassword(String password) {
-			this.password = password;
-		}
-
-	}
+            fail("Incorrect usage of method should have thrown an error.");
+        }
+        catch (InjectionException e)
+        {
+            // Expected
+            System.out.println("Failed as expected.");
+        }
+    }
 
 }

@@ -21,9 +21,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
-import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 /**
@@ -45,6 +42,12 @@ public class PropertyValueInjector
     {
         try
         {
+            if (target instanceof Class)
+            {
+                throw new InjectionException("Incorrect parameter for injection. You should not use a class " +
+                                             "representation, but rather -- the instance of the actual object.");
+            }
+
             Class clazz = target.getClass();
 
             loadPropertyResources(clazz);

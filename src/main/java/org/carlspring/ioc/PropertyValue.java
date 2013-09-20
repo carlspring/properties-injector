@@ -36,4 +36,9 @@ public @interface PropertyValue
      */
     String resource() default "";
 
+    /**
+     * The default value to use, if none can be read from the resource and none was specified.
+     */
+    String defaultValue() default "";
+
 }

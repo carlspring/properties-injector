@@ -17,6 +17,8 @@ package org.carlspring.ioc;
  */
 
 import org.carlspring.ioc.mock.*;
+
+import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -152,6 +154,39 @@ public class PropertyValueInjectionTest
             // Expected
             System.out.println("Failed as expected.");
         }
+    }
+
+    @Test
+    public void testInjectionForPropertyHolderWithoutPropertiesResource()
+            throws InjectionException
+    {
+        System.out.println("Testing property injection for a class that doesn't have a @PropertiesResource annotation...");
+
+        PropertyHolderWithoutPropertiesResource holder = new PropertyHolderWithoutPropertiesResource();
+
+        System.setProperty("jdbc.username", "admin");
+        System.setProperty("jdbc.password", "password");
+
+        holder.init();
+
+        System.getProperties().remove("jdbc.username");
+        System.getProperties().remove("jdbc.password");
+
+        assertEquals("Failed to inject property based on system property!", "admin", holder.getUsername());
+        assertEquals("Failed to inject property based on system property!", "password", holder.getPassword());
+
+        System.out.println("jdbc.username: " + holder.getUsername());
+        System.out.println("jdbc.password: " + holder.getPassword());
+    }
+
+    @Test
+    public void testDefaultValueInjection()
+            throws InjectionException
+    {
+        PropertyHolder holder = new PropertyHolder();
+        PropertyValueInjector.inject(holder);
+
+        assertEquals("Failed to fallback to defaultValue!", "postgresql", holder.getDialect());
     }
 
 }

@@ -1,13 +1,13 @@
 package org.carlspring.ioc.mock;
 
-import org.carlspring.ioc.PropertiesResources;
+import org.carlspring.ioc.InjectionException;
 import org.carlspring.ioc.PropertyValue;
+import org.carlspring.ioc.PropertyValueInjector;
 
 /**
  * @author mtodorov
  */
-@PropertiesResources(resources = {"META-INF/properties/jdbc.properties"})
-public class PropertyHolder
+public class PropertyHolderWithoutPropertiesResource
 {
 
     @PropertyValue(key = "jdbc.username")
@@ -17,15 +17,15 @@ public class PropertyHolder
     @PropertyValue(key = "jdbc.password")
     private String password;
 
-    @PropertyValue(key = "")
-    String blah;
 
-    @PropertyValue(key = "jdbc.dialect", defaultValue = "postgresql")
-    String dialect;
-
-
-    public PropertyHolder()
+    public PropertyHolderWithoutPropertiesResource()
     {
+    }
+
+    public void init()
+            throws InjectionException
+    {
+        PropertyValueInjector.inject(this);
     }
 
     public String getUsername()
@@ -46,16 +46,6 @@ public class PropertyHolder
     public void setPassword(String password)
     {
         this.password = password;
-    }
-
-    public String getDialect()
-    {
-        return dialect;
-    }
-
-    public void setDialect(String dialect)
-    {
-        this.dialect = dialect;
     }
 
 }

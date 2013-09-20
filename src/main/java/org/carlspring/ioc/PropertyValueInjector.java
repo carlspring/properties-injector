@@ -109,6 +109,11 @@ public class PropertyValueInjector
                     }
                 }
 
+                if (value == null || value.trim().equals(""))
+                {
+                    value = propertyValue.defaultValue();
+                }
+
                 if (value != null)
                 {
                     // Add this check, as some fields might already have a defined value and

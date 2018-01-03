@@ -1,5 +1,10 @@
 package org.carlspring.ioc;
 
+import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * Copyright 2012 Martin Todorov.
  *
@@ -15,17 +20,15 @@ package org.carlspring.ioc;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import org.carlspring.ioc.mock.*;
-
-import junit.framework.Assert;
+import org.carlspring.ioc.mock.ClassExtendingAbstractPropertyHolder;
+import org.carlspring.ioc.mock.ExtendedPropertyHolder;
+import org.carlspring.ioc.mock.PropertyHolder;
+import org.carlspring.ioc.mock.PropertyHolderWithClassReference;
+import org.carlspring.ioc.mock.PropertyHolderWithIncorrectResource;
+import org.carlspring.ioc.mock.PropertyHolderWithIntAndLongProperties;
+import org.carlspring.ioc.mock.PropertyHolderWithoutPropertiesResource;
 import org.junit.Before;
 import org.junit.Test;
-
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author mtodorov
@@ -189,4 +192,28 @@ public class PropertyValueInjectionTest
         assertEquals("Failed to fallback to defaultValue!", "postgresql", holder.getDialect());
     }
 
+    @Test
+    public void testInjectionMultiTyped()
+            throws InjectionException
+    {
+        System.out.println("Testing class with integer and long properties...");
+
+        PropertyHolderWithIntAndLongProperties holder = new PropertyHolderWithIntAndLongProperties();
+        PropertyValueInjector.inject(holder);
+        
+        assertEquals("Failed to inject property 'prim.int'!", (int)1, holder.getPrimInt());
+        assertEquals("Failed to inject property 'java.int'!", new Integer(2), holder.getJavaInt());
+        
+        assertEquals("Failed to inject property 'prim.long'!", (long)3, holder.getPrimLong());
+        assertEquals("Failed to inject property 'java.long'!", new Long(4), holder.getJavaLong());
+
+        assertEquals("Failed to inject property 'prim.double'!", (double)5.5, holder.getPrimDouble(), 0);
+        assertEquals("Failed to inject property 'java.double'!", new Double(6.6), holder.getJavaDouble(), 0);
+        
+        assertEquals("Failed to inject property 'prim.bool'!", (boolean)true, holder.isPrimBool());
+        assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimBool());
+
+    }
+    
+    
 }

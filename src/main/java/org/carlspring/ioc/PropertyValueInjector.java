@@ -245,7 +245,7 @@ public class PropertyValueInjector
         }
     }
 
-    private static void setField(Field field,
+	private static void setField(Field field,
                                  Object target,
                                  Object value)
             throws IllegalAccessException
@@ -259,41 +259,37 @@ public class PropertyValueInjector
 
         try
         {
-            // Handle primitives
-            if (field.getType().equals(Integer.TYPE))
-            {
-                field.setInt(target, Integer.parseInt(value.toString()));
+        	Class<?> targetType = field.getType();
+        	Object convertedValue = value;
+        	
+            if (targetType.equals(Integer.class) || targetType.equals(Integer.TYPE)){
+            	convertedValue = Integer.parseInt(value.toString());
+            }  
+            else if (targetType.equals(Long.class) || targetType.equals(Long.TYPE)){
+            	convertedValue = Long.parseLong(value.toString());
+            } 
+            else if (targetType.equals(Float.class) || targetType.equals(Float.TYPE)){
+            	convertedValue = Float.parseFloat(value.toString());            	
             }
-            else if (field.getType().equals(Long.TYPE))
-            {
-                field.setLong(target, Long.parseLong(value.toString()));
-            }
-            else if (field.getType().equals(Float.TYPE))
-            {
-                field.setFloat(target, Float.parseFloat(value.toString()));
-            }
-            else if (field.getType().equals(Double.TYPE))
-            {
-                field.setDouble(target, Double.parseDouble(value.toString()));
-            }
-            else if (field.getType().equals(Boolean.TYPE))
-            {
-                field.setBoolean(target, Boolean.parseBoolean(value.toString()));
-            }
-            else if (field.getType().equals(Character.TYPE))
-            {
-                field.setChar(target, value.toString().charAt(0));
-            }
-            // Handle objects
-            else
-            {
-                field.set(target, value);
-            }
-        }
-        catch (IllegalAccessException iae)
-        {
-            throw new IllegalArgumentException("Could not set field " + field, iae);
-        }
+            else if (targetType.equals(Double.class) || targetType.equals(Double.TYPE)){
+            	convertedValue = Double.parseDouble(value.toString());            	
+            }  
+            else if (targetType.equals(Boolean.class) || targetType.equals(Boolean.TYPE)){
+            	convertedValue = Boolean.parseBoolean(value.toString());            	
+            }  
+            else if (targetType.equals(Character.class) || targetType.equals(Character.TYPE)){
+            	convertedValue = value.toString().charAt(0);            	
+            }  
+            
+            field.set(target, convertedValue);
+                        
+        } catch (IllegalAccessException iae) {
+        	throw new IllegalArgumentException("Could not set field " + field, iae);
+        	
+        } catch (NumberFormatException iae) {
+        	throw new IllegalArgumentException("Could not set field " + field, iae);
+    	}
+        
     }
 
 	public boolean resourceDoesNotExist() {

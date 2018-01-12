@@ -38,17 +38,18 @@ public class PropertyValueInjector
      * A list of cached properties.
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
-    
-    static boolean resourceDoesNotExist;
 
-    public static void inject(Object target) throws InjectionException
+	static boolean resourceDoesNotExist;
+
+    public static void inject(Object target)
+            throws InjectionException
     {
         try
         {
             if (target instanceof Class)
             {
-                throw new InjectionException("Incorrect parameter for injection. You should not use a class "
-                        + "representation, but rather -- the instance of the actual object.");
+                throw new InjectionException("Incorrect parameter for injection. You should not use a class " +
+                                             "representation, but rather -- the instance of the actual object.");
             }
 
             Class clazz = target.getClass();
@@ -66,7 +67,9 @@ public class PropertyValueInjector
         }
     }
 
-    private static void injectProperties(Object target, Class clazz) throws IOException, IllegalAccessException
+    private static void injectProperties(Object target,
+                                         Class clazz)
+            throws IOException, IllegalAccessException
     {
         final List<Field> fields = new ArrayList<Field>();
 
@@ -137,7 +140,8 @@ public class PropertyValueInjector
         }
     }
 
-    public static List<Field> getAllFields(List<Field> fields, Class<?> clazz)
+    public static List<Field> getAllFields(List<Field> fields,
+                                           Class<?> clazz)
     {
         Collections.addAll(fields, clazz.getDeclaredFields());
 
@@ -149,7 +153,8 @@ public class PropertyValueInjector
         return fields;
     }
 
-    private static void loadPropertyResources(Class clazz) throws IOException
+    private static void loadPropertyResources(Class clazz)
+            throws IOException
     {
         final List<Annotation> annotations = new ArrayList<Annotation>();
 
@@ -164,7 +169,8 @@ public class PropertyValueInjector
         }
     }
 
-    public static List<Annotation> getAllAnnotations(List<Annotation> annotations, Class<?> clazz)
+    public static List<Annotation> getAllAnnotations(List<Annotation> annotations,
+                                                     Class<?> clazz)
     {
         Collections.addAll(annotations, clazz.getAnnotations());
 
@@ -194,14 +200,17 @@ public class PropertyValueInjector
         return merged;
     }
 
-    public static String getValue(String key, String resource) throws IOException
+    public static String getValue(String key,
+                                  String resource)
+            throws IOException
     {
         final Properties properties = getProperties(resource);
 
         return properties.getProperty(key);
     }
 
-    public static Properties getProperties(String resource) throws IOException
+    public static Properties getProperties(String resource)
+            throws IOException
     {
         Properties properties;
         if (!cachedProperties.containsKey(resource))
@@ -214,7 +223,8 @@ public class PropertyValueInjector
         return properties;
     }
 
-    private static void loadProperties(String[] resources) throws IOException
+    private static void loadProperties(String[] resources)
+            throws IOException
     {
         for (String resource : resources)
         {
@@ -222,7 +232,8 @@ public class PropertyValueInjector
         }
     }
 
-    private static void loadProperties(String resource) throws IOException
+    private static void loadProperties(String resource)
+            throws IOException
     {
         if (!cachedProperties.containsKey(resource))
         {
@@ -252,8 +263,12 @@ public class PropertyValueInjector
         }
     }
 
-    private static void setField(Field field, Object target, Object value) throws IllegalAccessException
+    private static void setField(Field field,
+                                 Object target,
+                                 Object value)
+            throws IllegalAccessException
     {
+
 
         if (!Modifier.isPublic(field.getModifiers()))
         {
@@ -337,7 +352,8 @@ public class PropertyValueInjector
         return referenced;
     }
 
-    public static void preloadResource(String resource, Properties properties) {
+    public static void preloadResource(String resource, Properties properties) 
+    {
         if (!cachedProperties.containsKey(resource))
         {
             cachedProperties.put(resource, properties);

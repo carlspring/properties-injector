@@ -1,11 +1,9 @@
 Bas de Witte (proposed)
-- Do not ignore defaultValues from annotation if properties file missing  
-- Do not ignore environment variable values if properties file missing
+- Make PropertyValueInjector thread safe and extendable (e.g. singleton)
+- No longer use the resources annotated at field level for other fields       
 - Add setting to optionally throw exception on missing resource
-- Use pojo property name for key if key omitted in annotation
 - Add support for loading the properties from a HOME_VAR defined location
-- Perhaps add integration with commons configuration2?       
-  
+- Perhaps add integration with commons configuration2       
 
 Martin Todorov
 - Add annotation support on the getter method level.

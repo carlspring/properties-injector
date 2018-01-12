@@ -21,7 +21,12 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author mtodorov
@@ -33,28 +38,23 @@ public class PropertyValueInjector
      * A list of cached properties.
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
+    
+    static boolean resourceDoesNotExist;
 
-	static boolean resourceDoesNotExist;
-
-
-    public static void inject(Object target)
-            throws InjectionException
+    public static void inject(Object target) throws InjectionException
     {
         try
         {
             if (target instanceof Class)
             {
-                throw new InjectionException("Incorrect parameter for injection. You should not use a class " +
-                                             "representation, but rather -- the instance of the actual object.");
+                throw new InjectionException("Incorrect parameter for injection. You should not use a class "
+                        + "representation, but rather -- the instance of the actual object.");
             }
 
             Class clazz = target.getClass();
 
             loadPropertyResources(clazz);
-
-	        if (!resourceDoesNotExist) {
-		        injectProperties(target, clazz);
-	   	    }
+            injectProperties(target, clazz);
         }
         catch (IOException e)
         {
@@ -66,9 +66,7 @@ public class PropertyValueInjector
         }
     }
 
-    private static void injectProperties(Object target,
-                                         Class clazz)
-            throws IOException, IllegalAccessException
+    private static void injectProperties(Object target, Class clazz) throws IOException, IllegalAccessException
     {
         final List<Field> fields = new ArrayList<Field>();
 
@@ -84,12 +82,9 @@ public class PropertyValueInjector
 
                 if (key.trim().equals(""))
                 {
-                    // Put a warning here when the logging has been set up.
-
-                    // System.out.println("WARN: Ignoring @PropertyValue annotation on field '" + field.getName() +
-                    //                    "' in class '" +clazz.getName() + "' as it has an empty key.");
-
-                    continue;
+                    // use bean property name if property resource key omitted
+                    // in annotation
+                    key = field.getName();
                 }
 
                 String value;
@@ -101,6 +96,13 @@ public class PropertyValueInjector
                 {
                     if (propertyValue.resource().trim().equals(""))
                     {
+                        // NOTE: for bean property annotations not naming a specific resource 
+                        // the resources specified at class level are used for property lookup
+                        // which is what we want. However, currently the specific resources 
+                        // specified for other bean properties are searched as well and may 
+                        // even overwrite property values from the resource at class level. 
+                        // TODO: bdw, fix default resource selection strategy
+
                         value = getMergedProperties().getProperty(key);
                     }
                     else
@@ -112,8 +114,19 @@ public class PropertyValueInjector
                 if (value == null || value.trim().equals(""))
                 {
                     value = propertyValue.defaultValue();
+
+                    if ((value == null || value.trim().equals("")))
+                    {
+                        if (target != null)
+                        {
+                            // retain initialized bean property value if default
+                            // value is omitted in annotation
+                            value = null;
+                        }
+                    }
                 }
 
+                // inject value
                 if (value != null)
                 {
                     // Add this check, as some fields might already have a defined value and
@@ -124,8 +137,7 @@ public class PropertyValueInjector
         }
     }
 
-    public static List<Field> getAllFields(List<Field> fields,
-                                           Class<?> clazz)
+    public static List<Field> getAllFields(List<Field> fields, Class<?> clazz)
     {
         Collections.addAll(fields, clazz.getDeclaredFields());
 
@@ -137,8 +149,7 @@ public class PropertyValueInjector
         return fields;
     }
 
-    private static void loadPropertyResources(Class clazz)
-            throws IOException
+    private static void loadPropertyResources(Class clazz) throws IOException
     {
         final List<Annotation> annotations = new ArrayList<Annotation>();
 
@@ -153,8 +164,7 @@ public class PropertyValueInjector
         }
     }
 
-    public static List<Annotation> getAllAnnotations(List<Annotation> annotations,
-                                                     Class<?> clazz)
+    public static List<Annotation> getAllAnnotations(List<Annotation> annotations, Class<?> clazz)
     {
         Collections.addAll(annotations, clazz.getAnnotations());
 
@@ -184,17 +194,14 @@ public class PropertyValueInjector
         return merged;
     }
 
-    public static String getValue(String key,
-                                  String resource)
-            throws IOException
+    public static String getValue(String key, String resource) throws IOException
     {
         final Properties properties = getProperties(resource);
 
         return properties.getProperty(key);
     }
 
-    public static Properties getProperties(String resource)
-            throws IOException
+    public static Properties getProperties(String resource) throws IOException
     {
         Properties properties;
         if (!cachedProperties.containsKey(resource))
@@ -207,8 +214,7 @@ public class PropertyValueInjector
         return properties;
     }
 
-    private static void loadProperties(String[] resources)
-            throws IOException
+    private static void loadProperties(String[] resources) throws IOException
     {
         for (String resource : resources)
         {
@@ -216,8 +222,7 @@ public class PropertyValueInjector
         }
     }
 
-    private static void loadProperties(String resource)
-            throws IOException
+    private static void loadProperties(String resource) throws IOException
     {
         if (!cachedProperties.containsKey(resource))
         {
@@ -230,8 +235,10 @@ public class PropertyValueInjector
             }
             catch (NullPointerException e)
             {
-	            System.err.println("WARN: Resource '" + resource +"' does not exist or could not be loaded! Properties mapped to this resource will not be injected.");
-	            resourceDoesNotExist = true;
+//                System.err.println("WARN: Resource '" + resource
+//                        + "' does not exist or could not be loaded! Properties mapped to this resource will not be injected.");
+                
+                resourceDoesNotExist = true;
             }
             finally
             {
@@ -245,12 +252,8 @@ public class PropertyValueInjector
         }
     }
 
-	private static void setField(Field field,
-                                 Object target,
-                                 Object value)
-            throws IllegalAccessException
+    private static void setField(Field field, Object target, Object value) throws IllegalAccessException
     {
-
 
         if (!Modifier.isPublic(field.getModifiers()))
         {
@@ -259,41 +262,86 @@ public class PropertyValueInjector
 
         try
         {
-        	Class<?> targetType = field.getType();
-        	Object convertedValue = value;
-        	
-            if (targetType.equals(Integer.class) || targetType.equals(Integer.TYPE)){
-            	convertedValue = Integer.parseInt(value.toString());
-            }  
-            else if (targetType.equals(Long.class) || targetType.equals(Long.TYPE)){
-            	convertedValue = Long.parseLong(value.toString());
-            } 
-            else if (targetType.equals(Float.class) || targetType.equals(Float.TYPE)){
-            	convertedValue = Float.parseFloat(value.toString());            	
+            Class<?> targetType = field.getType();
+            Object convertedValue = value;
+
+            if (targetType.equals(Integer.class) || targetType.equals(Integer.TYPE))
+            {
+                convertedValue = Integer.parseInt(value.toString());
             }
-            else if (targetType.equals(Double.class) || targetType.equals(Double.TYPE)){
-            	convertedValue = Double.parseDouble(value.toString());            	
-            }  
-            else if (targetType.equals(Boolean.class) || targetType.equals(Boolean.TYPE)){
-            	convertedValue = Boolean.parseBoolean(value.toString());            	
-            }  
-            else if (targetType.equals(Character.class) || targetType.equals(Character.TYPE)){
-            	convertedValue = value.toString().charAt(0);            	
-            }  
-            
+            else if (targetType.equals(Long.class) || targetType.equals(Long.TYPE))
+            {
+                convertedValue = Long.parseLong(value.toString());
+            }
+            else if (targetType.equals(Float.class) || targetType.equals(Float.TYPE))
+            {
+                convertedValue = Float.parseFloat(value.toString());
+            }
+            else if (targetType.equals(Double.class) || targetType.equals(Double.TYPE))
+            {
+                convertedValue = Double.parseDouble(value.toString());
+            }
+            else if (targetType.equals(Boolean.class) || targetType.equals(Boolean.TYPE))
+            {
+                convertedValue = Boolean.parseBoolean(value.toString());
+            }
+            else if (targetType.equals(Character.class) || targetType.equals(Character.TYPE))
+            {
+                convertedValue = value.toString().charAt(0);
+            }
+
             field.set(target, convertedValue);
-                        
-        } catch (IllegalAccessException iae) {
-        	throw new IllegalArgumentException("Could not set field " + field, iae);
-        	
-        } catch (NumberFormatException iae) {
-        	throw new IllegalArgumentException("Could not set field " + field, iae);
-    	}
-        
+
+        }
+        catch (IllegalAccessException iae)
+        {
+            throw new IllegalArgumentException("Could not set field " + field, iae);
+
+        }
+        catch (NumberFormatException iae)
+        {
+            throw new IllegalArgumentException("Could not set field " + field, iae);
+        }
+
     }
 
-	public boolean resourceDoesNotExist() {
-		return resourceDoesNotExist;
-	}
+    public boolean resourceDoesNotExist()
+    {
+        return resourceDoesNotExist;
+    }
 
+    
+    public static List<String> getReferencedResourceNames(Object target)
+    {
+        List<String> referenced = new ArrayList<String>();
+
+        final List<Annotation> annotations = new ArrayList<Annotation>();
+
+        Class clazz = target.getClass();
+        getAllAnnotations(annotations, clazz);
+
+        for (Annotation annotation : annotations)
+        {
+            if (annotation instanceof PropertiesResources)
+            {
+                String[] resources = ((PropertiesResources) annotation).resources();
+                for (String resource : resources)
+                {
+                    {
+                        referenced.add(resource);
+                    }
+                }
+            }
+        }
+
+        return referenced;
+    }
+
+    public static void preloadResource(String resource, Properties properties) {
+        if (!cachedProperties.containsKey(resource))
+        {
+            cachedProperties.put(resource, properties);
+        }
+    }
+    
 }

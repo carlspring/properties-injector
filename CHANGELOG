@@ -1,1 +1,4 @@
-2018/03/01	1.9.0 basdewitte	added support for non string properties
+2018/01/11	1.9.0 basdewitte	use bean property name for property key if omitted in annotation
+2018/01/11	1.9.0 basdewitte	no longer skip injecting defaults when resource missing  	
+2018/01/11	1.9.0 basdewitte	no longer skip injecting system variable values when resource missing
+2018/01/03	1.9.0 basdewitte	added support for non string properties

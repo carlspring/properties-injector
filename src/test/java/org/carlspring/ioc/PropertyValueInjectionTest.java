@@ -1,6 +1,5 @@
 package org.carlspring.ioc;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -24,8 +23,8 @@ import org.carlspring.ioc.mock.ClassExtendingAbstractPropertyHolder;
 import org.carlspring.ioc.mock.ExtendedPropertyHolder;
 import org.carlspring.ioc.mock.PropertyHolder;
 import org.carlspring.ioc.mock.PropertyHolderWithClassReference;
-import org.carlspring.ioc.mock.PropertyHolderWithIncorrectResource;
 import org.carlspring.ioc.mock.PropertyHolderWithIntAndLongProperties;
+import org.carlspring.ioc.mock.PropertyHolderWithMissingResource;
 import org.carlspring.ioc.mock.PropertyHolderWithoutPropertiesResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,15 +104,17 @@ public class PropertyValueInjectionTest
     public void testInjectionWithIncorrectResource()
             throws InjectionException
     {
-        System.out.println("Testing class with incorrect resource...");
+        System.out.println("Testing class with missing resource...");
 
         System.getProperties().setProperty("jdbc.password", "mypassw0rd");
 
-        PropertyHolderWithIncorrectResource holder = new PropertyHolderWithIncorrectResource();
+        PropertyHolderWithMissingResource holder = new PropertyHolderWithMissingResource();
 
         PropertyValueInjector.inject(holder);
 
-        assertNull("Should have failed to inject property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Should have injected system property value for property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Should have injected default value for bean property 'fromDefault'!", holder.getFromDefault());
+        assertEquals("Should have retained value for bean property 'retainValue'!", "retained", holder.getRetainValue());
     }
 
     @Test
@@ -200,20 +201,18 @@ public class PropertyValueInjectionTest
 
         PropertyHolderWithIntAndLongProperties holder = new PropertyHolderWithIntAndLongProperties();
         PropertyValueInjector.inject(holder);
-        
-        assertEquals("Failed to inject property 'prim.int'!", (int)1, holder.getPrimInt());
+
+        assertEquals("Failed to inject property 'prim.int'!", (int) 1, holder.getPrimInt());
         assertEquals("Failed to inject property 'java.int'!", new Integer(2), holder.getJavaInt());
-        
-        assertEquals("Failed to inject property 'prim.long'!", (long)3, holder.getPrimLong());
+
+        assertEquals("Failed to inject property 'prim.long'!", (long) 3, holder.getPrimLong());
         assertEquals("Failed to inject property 'java.long'!", new Long(4), holder.getJavaLong());
 
-        assertEquals("Failed to inject property 'prim.double'!", (double)5.5, holder.getPrimDouble(), 0);
+        assertEquals("Failed to inject property 'prim.double'!", (double) 5.5, holder.getPrimDouble(), 0);
         assertEquals("Failed to inject property 'java.double'!", new Double(6.6), holder.getJavaDouble(), 0);
-        
-        assertEquals("Failed to inject property 'prim.bool'!", (boolean)true, holder.isPrimBool());
+
+        assertEquals("Failed to inject property 'prim.bool'!", (boolean) true, holder.isPrimBool());
         assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimBool());
 
     }
-    
-    
 }

@@ -12,22 +12,22 @@ public class PropertyHolderWithIntAndLongProperties
 {
 
     @PropertyValue(key = "prim.int")
-    protected int primInt;
+    protected int primitiveInteger;
 
     @PropertyValue(key = "prim.long")
-    protected long primLong;
+    protected long primitiveLong;
 
     @PropertyValue(key = "prim.double")
-    protected double primDouble;
+    protected double primitiveDouble;
 
     @PropertyValue(key = "prim.float")
-    protected float primFloat;
+    protected float primitiveFloat;
 
     @PropertyValue(key = "prim.bool")
-    protected boolean primBool;
+    protected boolean primitiveBoolean;
 
     @PropertyValue(key = "java.int")
-    protected Integer javaInt;
+    protected Integer javaInteger;
 
     @PropertyValue(key = "java.long")
     protected Long javaLong;
@@ -39,106 +39,86 @@ public class PropertyHolderWithIntAndLongProperties
     protected Float javaFloat;
 
     @PropertyValue(key = "java.bool")
-    protected Boolean javaBool;
+    protected Boolean javaBoolean;
 
-    public int getPrimInt()
-    {
-        return primInt;
-    }
+	public int getPrimitiveInteger() {
+		return primitiveInteger;
+	}
 
-    public void setPrimInt(int primInt)
-    {
-        this.primInt = primInt;
-    }
+	public void setPrimitiveInteger(int primitiveInteger) {
+		this.primitiveInteger = primitiveInteger;
+	}
 
-    public long getPrimLong()
-    {
-        return primLong;
-    }
+	public long getPrimitiveLong() {
+		return primitiveLong;
+	}
 
-    public void setPrimLong(long primLong)
-    {
-        this.primLong = primLong;
-    }
+	public void setPrimitiveLong(long primitiveLong) {
+		this.primitiveLong = primitiveLong;
+	}
 
-    public double getPrimDouble()
-    {
-        return primDouble;
-    }
+	public double getPrimitiveDouble() {
+		return primitiveDouble;
+	}
 
-    public void setPrimDouble(double primDouble)
-    {
-        this.primDouble = primDouble;
-    }
+	public void setPrimitiveDouble(double primitiveDouble) {
+		this.primitiveDouble = primitiveDouble;
+	}
 
-    public float getPrimFloat()
-    {
-        return primFloat;
-    }
+	public float getPrimitiveFloat() {
+		return primitiveFloat;
+	}
 
-    public void setPrimFloat(float primFloat)
-    {
-        this.primFloat = primFloat;
-    }
+	public void setPrimitiveFloat(float primitiveFloat) {
+		this.primitiveFloat = primitiveFloat;
+	}
 
-    public boolean isPrimBool()
-    {
-        return primBool;
-    }
+	public boolean isPrimitiveBoolean() {
+		return primitiveBoolean;
+	}
 
-    public void setPrimBool(boolean primBool)
-    {
-        this.primBool = primBool;
-    }
+	public void setPrimitiveBoolean(boolean primitiveBoolean) {
+		this.primitiveBoolean = primitiveBoolean;
+	}
+	
+	public Integer getJavaInteger() {
+		return javaInteger;
+	}
 
-    public Integer getJavaInt()
-    {
-        return javaInt;
-    }
+	public void setJavaInteger(Integer javaInteger) {
+		this.javaInteger = javaInteger;
+	}
 
-    public void setJavaInt(Integer javaInt)
-    {
-        this.javaInt = javaInt;
-    }
+	public Long getJavaLong() {
+		return javaLong;
+	}
 
-    public Long getJavaLong()
-    {
-        return javaLong;
-    }
+	public void setJavaLong(Long javaLong) {
+		this.javaLong = javaLong;
+	}
 
-    public void setJavaLong(Long javaLong)
-    {
-        this.javaLong = javaLong;
-    }
+	public Double getJavaDouble() {
+		return javaDouble;
+	}
 
-    public Double getJavaDouble()
-    {
-        return javaDouble;
-    }
+	public void setJavaDouble(Double javaDouble) {
+		this.javaDouble = javaDouble;
+	}
 
-    public void setJavaDouble(Double javaDouble)
-    {
-        this.javaDouble = javaDouble;
-    }
+	public Float getJavaFloat() {
+		return javaFloat;
+	}
 
-    public Float getJavaFloat()
-    {
-        return javaFloat;
-    }
+	public void setJavaFloat(Float javaFloat) {
+		this.javaFloat = javaFloat;
+	}
 
-    public void setJavaFloat(Float javaFloat)
-    {
-        this.javaFloat = javaFloat;
-    }
+	public Boolean getJavaBoolean() {
+		return javaBoolean;
+	}
 
-    public Boolean getJavaBool()
-    {
-        return javaBool;
-    }
-
-    public void setJavaBool(Boolean javaBool)
-    {
-        this.javaBool = javaBool;
-    }
+	public void setJavaBoolean(Boolean javaBoolean) {
+		this.javaBoolean = javaBoolean;
+	}
 
 }

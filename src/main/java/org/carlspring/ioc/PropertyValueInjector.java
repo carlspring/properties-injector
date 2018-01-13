@@ -306,12 +306,10 @@ public class PropertyValueInjector
             }
 
             field.set(target, convertedValue);
-
         }
         catch (IllegalAccessException iae)
         {
-            throw new IllegalArgumentException("Could not set field " + field, iae);
-
+            throw new IllegalArgumentException("Could not set field " + field, iae);        
         }
         catch (NumberFormatException iae)
         {

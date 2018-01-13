@@ -202,17 +202,17 @@ public class PropertyValueInjectionTest
         PropertyHolderWithIntAndLongProperties holder = new PropertyHolderWithIntAndLongProperties();
         PropertyValueInjector.inject(holder);
 
-        assertEquals("Failed to inject property 'prim.int'!", (int) 1, holder.getPrimInt());
-        assertEquals("Failed to inject property 'java.int'!", new Integer(2), holder.getJavaInt());
+        assertEquals("Failed to inject property 'prim.int'!", (int) 1, holder.getPrimitiveInteger());
+        assertEquals("Failed to inject property 'java.int'!", new Integer(2), holder.getJavaInteger());
 
-        assertEquals("Failed to inject property 'prim.long'!", (long) 3, holder.getPrimLong());
+        assertEquals("Failed to inject property 'prim.long'!", (long) 3, holder.getPrimitiveLong());
         assertEquals("Failed to inject property 'java.long'!", new Long(4), holder.getJavaLong());
 
-        assertEquals("Failed to inject property 'prim.double'!", (double) 5.5, holder.getPrimDouble(), 0);
+        assertEquals("Failed to inject property 'prim.double'!", (double) 5.5, holder.getPrimitiveDouble(), 0);
         assertEquals("Failed to inject property 'java.double'!", new Double(6.6), holder.getJavaDouble(), 0);
 
-        assertEquals("Failed to inject property 'prim.bool'!", (boolean) true, holder.isPrimBool());
-        assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimBool());
+        assertEquals("Failed to inject property 'prim.bool'!", (boolean) true, holder.isPrimitiveBoolean());
+        assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimitiveBoolean());
 
     }
 }

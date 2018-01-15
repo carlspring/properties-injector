@@ -6,7 +6,6 @@ import org.carlspring.ioc.PropertyValue;
 /**
  * @author basdewitte
  */
-
 @PropertiesResources(resources = { "META-INF/properties/typed.properties" })
 public class PropertyHolderWithIntAndLongProperties
 {

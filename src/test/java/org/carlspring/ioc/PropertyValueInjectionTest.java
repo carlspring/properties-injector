@@ -2,6 +2,7 @@ package org.carlspring.ioc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -25,6 +26,7 @@ import org.carlspring.ioc.mock.PropertyHolder;
 import org.carlspring.ioc.mock.PropertyHolderWithClassReference;
 import org.carlspring.ioc.mock.PropertyHolderWithIntAndLongProperties;
 import org.carlspring.ioc.mock.PropertyHolderWithMissingResource;
+import org.carlspring.ioc.mock.PropertyHolderUsingMultipleResouces;
 import org.carlspring.ioc.mock.PropertyHolderWithoutPropertiesResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,6 +215,23 @@ public class PropertyValueInjectionTest
 
         assertEquals("Failed to inject property 'prim.bool'!", (boolean) true, holder.isPrimitiveBoolean());
         assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimitiveBoolean());
+    }
 
+    @Test
+    public void testInjectionForPropertyHolderUsingMultipleResources()
+            throws InjectionException
+    {
+        System.out.println("Testing injecting properties from multiple resources...");
+        
+        PropertyHolderUsingMultipleResouces holder = new PropertyHolderUsingMultipleResouces();
+        PropertyValueInjector.inject(holder);
+
+        assertEquals("Failed to correctly inject value for bean property 'dbUsername", "dbUsername", holder.getDbUsername());
+        assertEquals("Failed to correctly inject value for bean property 'dbPublicUsername", "dbPublicUsername", holder.getDbPublicUsername());
+        assertEquals("Failed to correctly inject value for bean property 'dbPrivateUsername", "dbPrivateUsername", holder.getDbPrivateUsername());
+        assertEquals("Failed to correctly inject value for bean property 'xtdUsername", "xtdUsername", holder.getXtdUsername());
+        assertEquals("Failed to correctly inject value for bean property 'appOverride", "overridden", holder.getAppOverride());
+        
+                
     }
 }

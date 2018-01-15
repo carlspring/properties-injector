@@ -38,6 +38,7 @@ public class PropertyValueInjector
      * A list of cached properties.
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
+    static Properties classLevelProperties = new Properties();
 
 	static boolean resourceDoesNotExist;
 
@@ -54,14 +55,10 @@ public class PropertyValueInjector
 
             Class clazz = target.getClass();
 
-            loadPropertyResources(clazz);
+            cacheAllReferencedResources(clazz);
             injectProperties(target, clazz);
         }
-        catch (IOException e)
-        {
-            throw new InjectionException(e);
-        }
-        catch (IllegalAccessException e)
+        catch (IOException | IllegalAccessException e)
         {
             throw new InjectionException(e);
         }
@@ -97,21 +94,7 @@ public class PropertyValueInjector
                 }
                 else
                 {
-                    if (propertyValue.resource().trim().equals(""))
-                    {
-                        // NOTE: for bean property annotations not naming a specific resource 
-                        // the resources specified at class level are used for property lookup
-                        // which is what we want. However, currently the specific resources 
-                        // specified for other bean properties are searched as well and may 
-                        // even overwrite property values from the resource at class level. 
-                        // TODO: bdw, fix default resource selection strategy
-
-                        value = getMergedProperties().getProperty(key);
-                    }
-                    else
-                    {
-                        value = getValue(key, propertyValue.resource());
-                    }
+                    value = getValue(key, propertyValue.resource());
                 }
 
                 if (value == null || value.trim().equals(""))
@@ -153,9 +136,10 @@ public class PropertyValueInjector
         return fields;
     }
 
-    private static void loadPropertyResources(Class clazz)
+    private static void cacheAllReferencedResources(Class clazz)
             throws IOException
     {
+        // class level 
         final List<Annotation> annotations = new ArrayList<Annotation>();
 
         getAllAnnotations(annotations, clazz);
@@ -164,7 +148,27 @@ public class PropertyValueInjector
         {
             if (annotation instanceof PropertiesResources)
             {
-                loadProperties(((PropertiesResources) annotation).resources());
+                String[] resources = ((PropertiesResources) annotation).resources();
+                for (String resource : resources)
+                {
+                    Properties properties = cachePropertyResource(resource);
+                    cacheClassLevelProperties(properties);
+                }
+            }
+        }
+
+        // bean property level 
+        final List<Field> fields = new ArrayList<Field>();
+
+        getAllFields(fields, clazz);
+
+        for (Field field : fields)
+        {
+            PropertyValue propertyValue = field.getAnnotation(PropertyValue.class);
+
+            if (propertyValue != null)
+            {
+                cachePropertyResource(propertyValue.resource());
             }
         }
     }
@@ -182,62 +186,46 @@ public class PropertyValueInjector
         return annotations;
     }
 
-    public static Properties getMergedProperties()
+    private static void cacheClassLevelProperties(Properties properties)
     {
-        Properties merged = new Properties();
-
-        for (String key : cachedProperties.keySet())
+        for (Object o : properties.keySet())
         {
-            Properties properties = cachedProperties.get(key);
-
-            for (Object o : properties.keySet())
-            {
-                String propertyKey = (String) o;
-                merged.put(propertyKey, properties.getProperty(propertyKey));
-            }
+            String propertyKey = (String) o;
+            classLevelProperties.setProperty(propertyKey, properties.getProperty(propertyKey)); 
         }
-
-        return merged;
     }
-
+    
     public static String getValue(String key,
                                   String resource)
             throws IOException
     {
-        final Properties properties = getProperties(resource);
-
-        return properties.getProperty(key);
-    }
-
-    public static Properties getProperties(String resource)
-            throws IOException
-    {
-        Properties properties;
-        if (!cachedProperties.containsKey(resource))
+        String value = null;
+        
+        if (resource.trim().equals(""))
         {
-            loadProperties(resource);
+            value = classLevelProperties.getProperty(key);
+        }
+        else
+        {
+            Properties properties = cachedProperties.get(resource);
+            
+            if(properties != null)
+            {
+                value = properties.getProperty(key); 
+            }
         }
 
-        properties = cachedProperties.get(resource);
-
-        return properties;
+        return value;
     }
 
-    private static void loadProperties(String[] resources)
-            throws IOException
-    {
-        for (String resource : resources)
-        {
-            loadProperties(resource);
-        }
-    }
 
-    private static void loadProperties(String resource)
+    private static Properties cachePropertyResource(String resource)
             throws IOException
     {
+        Properties properties = new Properties();
+        
         if (!cachedProperties.containsKey(resource))
         {
-            Properties properties = new Properties();
             InputStream is = null;
             try
             {
@@ -261,8 +249,11 @@ public class PropertyValueInjector
 
             cachedProperties.put(resource, properties);
         }
+        
+        return properties;
     }
 
+    
     private static void setField(Field field,
                                  Object target,
                                  Object value)
@@ -357,5 +348,4 @@ public class PropertyValueInjector
             cachedProperties.put(resource, properties);
         }
     }
-    
 }

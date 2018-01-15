@@ -1,4 +1,10 @@
+Bas de Witte (proposed)
+- Make PropertyValueInjector thread safe and extendable (e.g. singleton)
+- Add setting to optionally throw exception on missing resource
+- Add support for loading the properties from a HOME_VAR defined location
+- Perhaps add integration with commons configuration2       
 
+Martin Todorov
 - Add annotation support on the getter method level.
 - Add proper logging.
 

@@ -1,5 +1,10 @@
 package org.carlspring.ioc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 /**
  * Copyright 2012 Martin Todorov.
  *
@@ -15,17 +20,16 @@ package org.carlspring.ioc;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import org.carlspring.ioc.mock.*;
-
-import junit.framework.Assert;
+import org.carlspring.ioc.mock.ClassExtendingAbstractPropertyHolder;
+import org.carlspring.ioc.mock.ExtendedPropertyHolder;
+import org.carlspring.ioc.mock.PropertyHolder;
+import org.carlspring.ioc.mock.PropertyHolderWithClassReference;
+import org.carlspring.ioc.mock.PropertyHolderWithIntAndLongProperties;
+import org.carlspring.ioc.mock.PropertyHolderWithMissingResource;
+import org.carlspring.ioc.mock.PropertyHolderUsingMultipleResouces;
+import org.carlspring.ioc.mock.PropertyHolderWithoutPropertiesResource;
 import org.junit.Before;
 import org.junit.Test;
-
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author mtodorov
@@ -102,15 +106,17 @@ public class PropertyValueInjectionTest
     public void testInjectionWithIncorrectResource()
             throws InjectionException
     {
-        System.out.println("Testing class with incorrect resource...");
+        System.out.println("Testing class with missing resource...");
 
         System.getProperties().setProperty("jdbc.password", "mypassw0rd");
 
-        PropertyHolderWithIncorrectResource holder = new PropertyHolderWithIncorrectResource();
+        PropertyHolderWithMissingResource holder = new PropertyHolderWithMissingResource();
 
         PropertyValueInjector.inject(holder);
 
-        assertNull("Should have failed to inject property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Should have injected system property value for property 'jdbc.password'!", holder.getPassword());
+        assertNotNull("Should have injected default value for bean property 'fromDefault'!", holder.getFromDefault());
+        assertEquals("Should have retained value for bean property 'retainValue'!", "retained", holder.getRetainValue());
     }
 
     @Test
@@ -189,4 +195,43 @@ public class PropertyValueInjectionTest
         assertEquals("Failed to fallback to defaultValue!", "postgresql", holder.getDialect());
     }
 
+    @Test
+    public void testInjectionMultiTyped()
+            throws InjectionException
+    {
+        System.out.println("Testing class with integer and long properties...");
+
+        PropertyHolderWithIntAndLongProperties holder = new PropertyHolderWithIntAndLongProperties();
+        PropertyValueInjector.inject(holder);
+
+        assertEquals("Failed to inject property 'prim.int'!", (int) 1, holder.getPrimitiveInteger());
+        assertEquals("Failed to inject property 'java.int'!", new Integer(2), holder.getJavaInteger());
+
+        assertEquals("Failed to inject property 'prim.long'!", (long) 3, holder.getPrimitiveLong());
+        assertEquals("Failed to inject property 'java.long'!", new Long(4), holder.getJavaLong());
+
+        assertEquals("Failed to inject property 'prim.double'!", (double) 5.5, holder.getPrimitiveDouble(), 0);
+        assertEquals("Failed to inject property 'java.double'!", new Double(6.6), holder.getJavaDouble(), 0);
+
+        assertEquals("Failed to inject property 'prim.bool'!", (boolean) true, holder.isPrimitiveBoolean());
+        assertEquals("Failed to inject property 'java.bool'!", new Boolean(true), holder.isPrimitiveBoolean());
+    }
+
+    @Test
+    public void testInjectionForPropertyHolderUsingMultipleResources()
+            throws InjectionException
+    {
+        System.out.println("Testing injecting properties from multiple resources...");
+        
+        PropertyHolderUsingMultipleResouces holder = new PropertyHolderUsingMultipleResouces();
+        PropertyValueInjector.inject(holder);
+
+        assertEquals("Failed to correctly inject value for bean property 'dbUsername", "dbUsername", holder.getDbUsername());
+        assertEquals("Failed to correctly inject value for bean property 'dbPublicUsername", "dbPublicUsername", holder.getDbPublicUsername());
+        assertEquals("Failed to correctly inject value for bean property 'dbPrivateUsername", "dbPrivateUsername", holder.getDbPrivateUsername());
+        assertEquals("Failed to correctly inject value for bean property 'xtdUsername", "xtdUsername", holder.getXtdUsername());
+        assertEquals("Failed to correctly inject value for bean property 'appOverride", "overridden", holder.getAppOverride());
+        
+                
+    }
 }

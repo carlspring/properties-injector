@@ -25,6 +25,7 @@ public class PropertyHolderUsingMultipleResouces
     @PropertyValue(key = "app.override")
     protected String appOverride;
     
+    
     public String getDbPublicUsername()
     {
         return dbPublicUsername;
@@ -65,13 +66,11 @@ public class PropertyHolderUsingMultipleResouces
         this.xtdUsername = xtdUsername;
     }
 
-    
     public String getAppOverride()
     {
         return appOverride;
     }
 
-    
     public void setAppOverride(String appOverride)
     {
         this.appOverride = appOverride;

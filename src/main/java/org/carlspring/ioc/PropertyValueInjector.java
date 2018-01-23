@@ -1,5 +1,7 @@
 package org.carlspring.ioc;
 
+import java.io.FileInputStream;
+
 /**
  * Copyright 2012 Martin Todorov.
  *
@@ -21,29 +23,54 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.text.StrSubstitutor;
+
 /**
  * @author mtodorov
  */
 public class PropertyValueInjector
 {
+    static String CLASSPATH_IDENTIFIER_NAME = "classpath:";
 
     /**
-     * A list of cached properties.
+     * Cached Properties per resourcename.
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
+    
+    
+    /**
+     * Cached properties defined though annotation at class level.
+     */
     static Properties classLevelProperties = new Properties();
+
+    /**
+     * Paths to look for property files in given order, overriding duplicates if any.    
+     */
+    static List<String> configLocations = null;
 
 	static boolean resourceDoesNotExist;
 
     public static void inject(Object target)
             throws InjectionException
+    {
+        List<String> locations = Arrays.asList(CLASSPATH_IDENTIFIER_NAME);
+        inject(target, locations); 
+    }
+
+    public static void inject(Object target, 
+            List<String> locations)
+            throws InjectionException
+   
     {
         try
         {
@@ -53,9 +80,11 @@ public class PropertyValueInjector
                                              "representation, but rather -- the instance of the actual object.");
             }
 
+            configLocations = expandConfigLocations(locations);
+            
             Class clazz = target.getClass();
-
             cacheAllReferencedResources(clazz);
+            
             injectProperties(target, clazz);
         }
         catch (IOException | IllegalAccessException e)
@@ -227,25 +256,36 @@ public class PropertyValueInjector
         if (!cachedProperties.containsKey(resource))
         {
             InputStream is = null;
-            try
+            
+            for (String location : configLocations)
             {
-                is = PropertyValueInjector.class.getClassLoader().getResourceAsStream(resource);
-                properties.load(is);
-            }
-            catch (NullPointerException e)
-            {
-//                System.err.println("WARN: Resource '" + resource
-//                        + "' does not exist or could not be loaded! Properties mapped to this resource will not be injected.");
-                
-                resourceDoesNotExist = true;
-            }
-            finally
-            {
-                if (is != null)
+                try
                 {
-                    is.close();
+                    if (location.startsWith(CLASSPATH_IDENTIFIER_NAME))
+                    {
+                        String path = Paths.get(location.substring(CLASSPATH_IDENTIFIER_NAME.length()), resource).toString();
+                        is = PropertyValueInjector.class.getClassLoader().getResourceAsStream(path);
+                    }
+                    else
+                    {
+                        Path path = Paths.get(location, resource); 
+                        is = new FileInputStream(path.toFile());
+                    }
+
+                    properties.load(is);
                 }
-            }
+                catch (NullPointerException | IOException  ex)
+                {
+                    resourceDoesNotExist = true;
+                }
+                finally
+                {
+                    if (is != null)
+                    {
+                        is.close();
+                    }
+                }
+            }            
 
             cachedProperties.put(resource, properties);
         }
@@ -306,7 +346,6 @@ public class PropertyValueInjector
         {
             throw new IllegalArgumentException("Could not set field " + field, iae);
         }
-
     }
 
     public boolean resourceDoesNotExist()
@@ -314,38 +353,16 @@ public class PropertyValueInjector
         return resourceDoesNotExist;
     }
 
-    
-    public static List<String> getReferencedResourceNames(Object target)
+    private static List<String> expandConfigLocations(List<String> locations)
     {
-        List<String> referenced = new ArrayList<String>();
-
-        final List<Annotation> annotations = new ArrayList<Annotation>();
-
-        Class clazz = target.getClass();
-        getAllAnnotations(annotations, clazz);
-
-        for (Annotation annotation : annotations)
+        List<String> configLocations = new ArrayList<>();
+        
+        for (String location : locations)
         {
-            if (annotation instanceof PropertiesResources)
-            {
-                String[] resources = ((PropertiesResources) annotation).resources();
-                for (String resource : resources)
-                {
-                    {
-                        referenced.add(resource);
-                    }
-                }
-            }
+            String configLocation = StrSubstitutor.replaceSystemProperties(location);
+            configLocations.add(configLocation);            
         }
 
-        return referenced;
-    }
-
-    public static void preloadResource(String resource, Properties properties) 
-    {
-        if (!cachedProperties.containsKey(resource))
-        {
-            cachedProperties.put(resource, properties);
-        }
+        return configLocations;
     }
 }

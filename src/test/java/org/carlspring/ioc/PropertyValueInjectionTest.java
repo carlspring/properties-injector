@@ -263,9 +263,7 @@ public class PropertyValueInjectionTest
         System.setProperty("INJECTOR_HOME", configDirectory);
 
         // read resource from class path first, then override with values from external location 
-        List<String> configLocations = Arrays.asList( 
-                "classpath:META-INF/properties/", 
-                "${INJECTOR_HOME}/conf/");
+        List<String> configLocations = Arrays.asList("classpath:META-INF/properties/", "${INJECTOR_HOME}/conf/");
 
         // inject
         PropertyHolderUsingMultipleConfigLocations holder = new PropertyHolderUsingMultipleConfigLocations();
@@ -274,5 +272,6 @@ public class PropertyValueInjectionTest
         
         assertEquals("Failed to correctly inject value for bean property 'dbUsername", "dbUsername", holder.getDbUsername());
         assertEquals("Failed to correctly inject value for bean property 'appOverride", "externalizedResourceValue", holder.getAppOverride());
-    }    
+    }
+    
 }

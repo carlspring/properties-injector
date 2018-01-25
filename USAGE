@@ -57,3 +57,22 @@ Example:
 
 
 If you pass properties as arguments to the JVM, they will get picked up and override all other values.
+
+You can also move your configuration outside the class path and pass a list of locations. These are 
+searched in order. If the same resource is found more than once, property values for matching keys 
+are replaced.  
+
+Example:
+
+        System.setProperty("MYAPP_HOME", "/etc/myapp/conf/");
+
+        List<String> configLocations = Arrays.asList( 
+                "classpath:META-INF/conf/",
+                "/home/tomcat/myapp/conf/",
+                "${MYAPP_HOME}/conf/");
+
+        PropertyHolder holder = new PropertyHolder();
+        
+        PropertyValueInjector.inject(holder, configLocations);
+
+

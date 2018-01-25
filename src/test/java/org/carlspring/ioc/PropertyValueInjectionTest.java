@@ -1,9 +1,15 @@
 package org.carlspring.ioc;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Copyright 2012 Martin Todorov.
@@ -23,10 +29,11 @@ import static org.junit.Assert.fail;
 import org.carlspring.ioc.mock.ClassExtendingAbstractPropertyHolder;
 import org.carlspring.ioc.mock.ExtendedPropertyHolder;
 import org.carlspring.ioc.mock.PropertyHolder;
+import org.carlspring.ioc.mock.PropertyHolderUsingMultipleConfigLocations;
+import org.carlspring.ioc.mock.PropertyHolderUsingMultipleResouces;
 import org.carlspring.ioc.mock.PropertyHolderWithClassReference;
 import org.carlspring.ioc.mock.PropertyHolderWithIntAndLongProperties;
 import org.carlspring.ioc.mock.PropertyHolderWithMissingResource;
-import org.carlspring.ioc.mock.PropertyHolderUsingMultipleResouces;
 import org.carlspring.ioc.mock.PropertyHolderWithoutPropertiesResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -190,6 +197,7 @@ public class PropertyValueInjectionTest
             throws InjectionException
     {
         PropertyHolder holder = new PropertyHolder();
+        
         PropertyValueInjector.inject(holder);
 
         assertEquals("Failed to fallback to defaultValue!", "postgresql", holder.getDialect());
@@ -202,6 +210,7 @@ public class PropertyValueInjectionTest
         System.out.println("Testing class with integer and long properties...");
 
         PropertyHolderWithIntAndLongProperties holder = new PropertyHolderWithIntAndLongProperties();
+        
         PropertyValueInjector.inject(holder);
 
         assertEquals("Failed to inject property 'prim.int'!", (int) 1, holder.getPrimitiveInteger());
@@ -224,6 +233,7 @@ public class PropertyValueInjectionTest
         System.out.println("Testing injecting properties from multiple resources...");
         
         PropertyHolderUsingMultipleResouces holder = new PropertyHolderUsingMultipleResouces();
+        
         PropertyValueInjector.inject(holder);
 
         assertEquals("Failed to correctly inject value for bean property 'dbUsername", "dbUsername", holder.getDbUsername());
@@ -231,7 +241,38 @@ public class PropertyValueInjectionTest
         assertEquals("Failed to correctly inject value for bean property 'dbPrivateUsername", "dbPrivateUsername", holder.getDbPrivateUsername());
         assertEquals("Failed to correctly inject value for bean property 'xtdUsername", "xtdUsername", holder.getXtdUsername());
         assertEquals("Failed to correctly inject value for bean property 'appOverride", "overridden", holder.getAppOverride());
-        
-                
     }
+    
+    @Test
+    public void testInjectionForPropertyHolderUsingMultipleConfigLocations()
+            throws InjectionException, IOException, URISyntaxException
+    {
+        final String resource = "/conf/app.properties";
+
+        System.out.println("Testing injecting properties from resources at multiple locations...");
+
+        // get path to an external location such as /opt/myapp/conf
+        // as this is inconvenient for this unit test use class path 
+        // directory 'other' to simulate the external location
+        
+        URL url = getClass().getClassLoader().getResource("other" + resource);
+        String path = Paths.get(url.toURI()).toString();
+        String configDirectory = path.substring(0, path.length() - resource.length());
+
+        // set system variable to the config location
+        System.setProperty("INJECTOR_HOME", configDirectory);
+
+        // read resource from class path first, then override with values from external location 
+        List<String> configLocations = Arrays.asList( 
+                "classpath:META-INF/properties/", 
+                "${INJECTOR_HOME}/conf/");
+
+        // inject
+        PropertyHolderUsingMultipleConfigLocations holder = new PropertyHolderUsingMultipleConfigLocations();
+        
+        PropertyValueInjector.inject(holder, configLocations);
+        
+        assertEquals("Failed to correctly inject value for bean property 'dbUsername", "dbUsername", holder.getDbUsername());
+        assertEquals("Failed to correctly inject value for bean property 'appOverride", "externalizedResourceValue", holder.getAppOverride());
+    }    
 }

@@ -47,7 +47,6 @@ public class PropertyValueInjector
      */
     static Map<String, Properties> cachedProperties = new LinkedHashMap<String, Properties>();
     
-    
     /**
      * Cached properties defined though annotation at class level.
      */
@@ -58,8 +57,8 @@ public class PropertyValueInjector
      */
     static List<String> configLocations = null;
 
-	static boolean resourceDoesNotExist;
-
+    static boolean resourceDoesNotExist;
+    
     public static void inject(Object target)
             throws InjectionException
     {
@@ -68,9 +67,8 @@ public class PropertyValueInjector
     }
 
     public static void inject(Object target, 
-            List<String> locations)
+                              List<String> locations)
             throws InjectionException
-   
     {
         try
         {
@@ -247,7 +245,6 @@ public class PropertyValueInjector
         return value;
     }
 
-
     private static Properties cachePropertyResource(String resource)
             throws IOException
     {
@@ -292,15 +289,12 @@ public class PropertyValueInjector
         
         return properties;
     }
-
     
     private static void setField(Field field,
                                  Object target,
                                  Object value)
             throws IllegalAccessException
     {
-
-
         if (!Modifier.isPublic(field.getModifiers()))
         {
             field.setAccessible(true);
@@ -365,4 +359,5 @@ public class PropertyValueInjector
 
         return configLocations;
     }
+    
 }

@@ -66,10 +66,9 @@ Example:
 
         System.setProperty("MYAPP_HOME", "/etc/myapp/conf/");
 
-        List<String> configLocations = Arrays.asList( 
-                "classpath:META-INF/conf/",
-                "/home/tomcat/myapp/conf/",
-                "${MYAPP_HOME}/conf/");
+        List<String> configLocations = Arrays.asList("classpath:META-INF/conf/",
+                                                     "/home/tomcat/myapp/conf/",
+                                                     "${MYAPP_HOME}/conf/");
 
         PropertyHolder holder = new PropertyHolder();
         

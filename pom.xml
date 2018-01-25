@@ -86,11 +86,11 @@
     </build>
 
     <dependencies>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.2</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.2</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -104,8 +104,8 @@
         <connection>scm:git:git@github.com:carlspring/properties-injector.git</connection>
         <url>scm:git:git@github.com:carlspring/properties-injector.git</url>
         <developerConnection>scm:git:git@github.com:carlspring/properties-injector.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -145,4 +145,3 @@
     </profiles>
 
 </project>
-

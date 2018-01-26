@@ -9,4 +9,4 @@ allowed to use it in your project.
 
 Check the USAGE file for examples of how to use the code.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.carlspring.maven/derby-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.carlspring.maven/derby-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.carlspring/properties-injector/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.carlspring/properties-injector)

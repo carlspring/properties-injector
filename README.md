@@ -7,6 +7,6 @@ This is a very lightweight alternative of Spring's cool org.springframework.bean
 While Spring's idea is great, sometimes you just have the limitation of not being
 allowed to use it in your project.
 
-Check the USAGE file for examples of how to use the code.
+Check the [USAGE](https://github.com/carlspring/properties-injector/blob/master/USAGE) file for examples of how to use the code.
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.carlspring/properties-injector/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.carlspring/properties-injector)
